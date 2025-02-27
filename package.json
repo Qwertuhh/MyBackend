@@ -1,0 +1,20 @@
+{
+  "name": "mybackend",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "backend",
+    "javascript"
+  ],
+  "author": "qwertuhh",
+  "license": "MIT",
+  "git repository": "https://github.com/Qwertuhh/mybackend.git",
+  "description": "This is a mega project created during journey of backend course",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
