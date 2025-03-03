@@ -2,10 +2,10 @@ import multer from "multer";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(Error("Destination undefined"), "public/temp");
+    cb(null, "./public/temp");
   },
   filename: function (req, file, cb) {
-    cb(Error("Filename undefined"), `${file.originalname}-${Date.now()}`);
+    cb(null, `${file.originalname}-${Date.now()}`);
   },
 });
 

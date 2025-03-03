@@ -10,9 +10,6 @@ async function connectDB() {
     console.log(`DB Connected To Host: "${connection.connection.host}"`);
   } catch (error) {
     console.error("DB Connection Failed :: ", error);
-  } finally {
-    //? Ensures that the client will close when you finish/error
-    await mongoose.disconnect();
   }
 }
 

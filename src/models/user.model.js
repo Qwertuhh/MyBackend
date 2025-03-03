@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_EXPIRY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET } from "../config.js";
 
@@ -24,6 +24,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      index: true,
       trim: true,
       pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
     },
