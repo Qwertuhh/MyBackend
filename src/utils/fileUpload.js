@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "../config.js";
+import { cloudinaryFolderPath } from "../constants.js";
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
@@ -14,6 +15,7 @@ const uploadFile = async (filePath) => {
   }
   const uploadResult = await cloudinary.uploader
     .upload(filePath, {
+      folder: cloudinaryFolderPath,
       resource_type: "auto",
     })
     .catch((error) => {
@@ -22,7 +24,7 @@ const uploadFile = async (filePath) => {
       //? To delete the file
       fs.unlinkSync(filePath);
     });
-    console.log("File uploaded successfully");
+  console.log("File uploaded successfully");
   fs.unlinkSync(filePath);
   return uploadResult;
 };

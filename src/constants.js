@@ -1,3 +1,3 @@
 const DB_NAME = 'mybackend';
-
-export{DB_NAME};
+const cloudinaryFolderPath = "MyBackend";
+export{DB_NAME, cloudinaryFolderPath};
