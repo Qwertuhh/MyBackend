@@ -7,7 +7,7 @@ const subscriptionSchema = new mongoose.Schema({
     required: false,
   },
   //? Internally channelOwner is a user or can be said channel
-  channelOwner: {
+  channel: {
     type: mongoose.Schema.Types.ObjectId, //? Channel Owner
     ref: "User",
     required: true,

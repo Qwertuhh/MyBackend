@@ -216,7 +216,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     throw new APIError(400, "Give email or username at least");
   }
 
-
   // Proceed with the update if no conflicts found
   const user = await User.findByIdAndUpdate(
     req.user._id,
@@ -234,6 +233,71 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   return res.status(200).json(new APIResponse(200, user, "User details updated successfully"));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  console.log(username);
+  console.log("Fetching channel...");
+  if (!username?.trim()) {
+    throw new APIError(400, "Username is required");
+  }
+
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username.toLowerCase(),
+      },
+    },
+
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscriberCount: { $size: "$subscribers" },
+        subscribedToCount: { $size: "$subscribedTo" },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullname: 1,
+        username: 1,
+        subscribedToCount: 1,
+        subscriberCount: 1,
+        isSubscribed: 1,
+        avatar: 1,
+        coverImage: 1,
+        email: 1,
+        createdAt: 1,
+      },
+    },
+  ]);
+  if (!channel?.length) {
+    throw new APIError(404, "Channel not found");
+  }
+  console.log(channel);
+  console.log("Channel fetched!");
+  return res.status(200).json(new APIResponse(200, channel[0], "Channel fetched successfully"));
+});
 export {
   registerUser,
   loginUser,
@@ -242,4 +306,5 @@ export {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
+  getUserChannelProfile,
 };

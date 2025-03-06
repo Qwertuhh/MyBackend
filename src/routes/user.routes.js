@@ -1,6 +1,15 @@
 import { Router } from "express";
 const router = Router();
-import { loginUser, logoutUser, refreshAccessToken, getCurrentUser, registerUser, changeCurrentPassword, updateAccountDetails } from "../controllers/user.controller.js";
+import {
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  getCurrentUser,
+  registerUser,
+  changeCurrentPassword,
+  updateAccountDetails,
+  getUserChannelProfile,
+} from "../controllers/user.controller.js";
 import { updateUserAvatar, updateUserCoverImage } from "../controllers/filesUpdate.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import verifyAccessToken from "../middlewares/auth.middleware.js";
@@ -26,6 +35,6 @@ router.route("/update-account").patch(verifyAccessToken, updateAccountDetails);
 router.route("/update-avatar").patch(verifyAccessToken, upload.single("avatar"), updateUserAvatar);
 router.route("/update-cover-image").patch(verifyAccessToken, upload.single("coverImage"), updateUserCoverImage);
 
-// router.route("/c/:username").get(verifyAccessToken, getUserChannelProfile);
+router.route("/channel/:username").get(verifyAccessToken, getUserChannelProfile);
 // router.route("/history").get(verifyAccessToken, getWatchHistory);
 export default router;
