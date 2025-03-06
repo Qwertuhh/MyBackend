@@ -5,6 +5,7 @@ import uploadFile from "../utils/fileUpload.js";
 import APIResponse from "../utils/APIResponse.js";
 import { REFRESH_TOKEN_SECRET } from "../config.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const options = {
   httpOnly: true,
@@ -298,6 +299,56 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
   console.log("Channel fetched!");
   return res.status(200).json(new APIResponse(200, channel[0], "Channel fetched successfully"));
 });
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+  const userWatchHistory = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId("67c9b1eeb2d6e1e9aebe712d"),
+      },
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "creator",
+              foreignField: "_id",
+              as: "creator",
+              pipeline: [
+                {
+                  $project: {
+                    pfullname: 1,
+                    username: 1,
+                    avatar: 1,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $addFields: {
+              creator: { $arrayElemAt: ["$creator", 0] },
+            },
+          },
+        ],
+      },
+    },
+    {
+      $project: {
+        watchHistory: 1,
+      },
+    },
+  ]);
+
+  return res.status(200).json(new APIResponse(200, userWatchHistory[0], "Watch history fetched successfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -307,4 +358,5 @@ export {
   getCurrentUser,
   updateAccountDetails,
   getUserChannelProfile,
+  getWatchHistory,
 };
