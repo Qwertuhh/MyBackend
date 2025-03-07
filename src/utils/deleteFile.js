@@ -9,8 +9,8 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const deleteFile = async (fileId) => {
-  const publicId = `${cloudinaryFolderPath}/${fileId.split("/").pop().split(".")[0]}`; //? Extract the public ID from the file URL
+const deleteFile = async (fileURL) => {
+  const publicId = `${cloudinaryFolderPath}/${fileURL.split("/").pop().split(".")[0]}`; //? Extract the public ID from the file URL
   try {
     console.log(`Deleting file "${publicId}" ...`);
     const result = await cloudinary.uploader.destroy(publicId); //? Delete the file from Cloudinary
@@ -27,8 +27,7 @@ const deleteFile = async (fileId) => {
 
     console.log("File deleted successfully");
   } catch (error) {
-    console.error("Error deleting file:", error);
-    throw new APIError(500, error.message || "Internal server error during file deletion");
+    throw new APIError(500, error.message || "Internal server error during file deletion"+error.message);
   }
 };
 

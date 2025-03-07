@@ -6,13 +6,14 @@ import APIResponse from "../utils/APIResponse.js";
 import { REFRESH_TOKEN_SECRET } from "../config.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import deleteFile from "../utils/deleteFile.js";
 
 const options = {
   httpOnly: true,
   secure: true,
 };
 
-const generateAccessTokenAndRefreshToken = async (userId) => {
+const generateAccessTokenAndRefreshToken = async userId => {
   try {
     const user = await User.findById(userId);
     const accessToken = user.createAccessToken();
@@ -31,7 +32,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { username, fullname, email, password } = req.body;
 
-  if ([fullname, email, username, password].some((field) => field?.trim() === "")) {
+  if ([fullname, email, username, password].some(field => field?.trim() === "")) {
     throw new APIError(400, "All fields are required");
   }
 
@@ -127,8 +128,8 @@ const logoutUser = asyncHandler(async (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: null,
+      $unset: {
+        refreshToken: 1,
       },
     },
     { new: true },
@@ -304,7 +305,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   const userWatchHistory = await User.aggregate([
     {
       $match: {
-        _id: new mongoose.Types.ObjectId("67c9b1eeb2d6e1e9aebe712d"),
+        _id: new mongoose.Types.ObjectId(req.user._id),
       },
     },
     {
@@ -345,8 +346,33 @@ const getWatchHistory = asyncHandler(async (req, res) => {
       },
     },
   ]);
-
   return res.status(200).json(new APIResponse(200, userWatchHistory[0], "Watch history fetched successfully"));
+});
+
+const deleteAccount = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    throw new APIError(400, "Password is required");
+  }
+
+  //? User exists because check is done in auth middleware
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new APIError(401, "User not found");
+  }
+  console.log(`Deleting "${user.username}" account...`);
+  const isPasswordMatched = await user.isPasswordMatched(password);
+  if (!isPasswordMatched) {
+    throw new APIError(401, "Password is incorrect");
+  }
+  console.log(user);
+  await deleteFile(user.avatar);
+  if (user?.coverImage) {
+    await deleteFile(user.coverImage);
+  }
+  await User.findByIdAndDelete(req.user._id);
+  console.log("Account deleted!");
+  return res.status(200).json(new APIResponse(200, {}, "Account deleted successfully"));
 });
 
 export {
@@ -359,4 +385,5 @@ export {
   updateAccountDetails,
   getUserChannelProfile,
   getWatchHistory,
+  deleteAccount,
 };

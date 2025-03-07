@@ -44,7 +44,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.user._id,
     {
-      avatar: coverImage.url,
+      coverImage: coverImage.url,
     },
     { new: true },
   ).select("-password -refreshToken");
