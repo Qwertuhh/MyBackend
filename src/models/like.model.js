@@ -1,20 +1,6 @@
 import mongoose from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-//! Liked To Schema if we want to use this structure
-// const likedToSchema = new mongoose.Schema({
-//   likedTo: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     required: true,
-//     refPath: "onModel",
-//   },
-//   onModel: {
-//     type: String,
-//     required: true,
-//     enum: ["User", "Tweet"],
-//   },
-// });
-
 const likeSchema = new mongoose.Schema(
   {
     owner: {
@@ -30,11 +16,6 @@ const likeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tweet",
     },
-    //! This is the new field we are adding to the like model
-    // likedTo: {
-    //     type: likedToSchema,
-    //     required: true,
-    // },
     likedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
