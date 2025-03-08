@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "../config.js";
-import { cloudinaryFolderPath } from "../constants.js";
+import { cloudinaryUserFolderPath, cloudinaryVideoFolderPath } from "../constants.js";
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
@@ -9,16 +9,20 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const uploadFile = async (filePath) => {
+const uploadFile = async (filePath, isVideo = false) => {
   if (!fs.existsSync(filePath)) {
     throw new Error("File not found");
+  }
+  let cloudinaryFolderPath = cloudinaryUserFolderPath;
+  if (isVideo) {
+    cloudinaryFolderPath = cloudinaryVideoFolderPath;
   }
   const uploadResult = await cloudinary.uploader
     .upload(filePath, {
       folder: cloudinaryFolderPath,
       resource_type: "auto",
     })
-    .catch((error) => {
+    .catch(error => {
       console.log(error);
 
       //? To delete the file

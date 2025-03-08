@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "../config.js";
-import { cloudinaryFolderPath } from "../constants.js";
+import { cloudinaryUserFolderPath, cloudinaryVideoFolderPath } from "../constants.js";
 import APIError from "./APIError.js";
 //! Delete file issue has to fix
 cloudinary.config({
@@ -9,8 +9,11 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const deleteFile = async (fileURL) => {
-  const publicId = `${cloudinaryFolderPath}/${fileURL.split("/").pop().split(".")[0]}`; //? Extract the public ID from the file URL
+const deleteFile = async (fileURL, isVideo=false) => {
+  let publicId = `${cloudinaryUserFolderPath}/${fileURL.split("/").pop().split(".")[0]}`; //? Extract the public ID from the file URL
+  if (isVideo) {
+    publicId = `${cloudinaryVideoFolderPath}/Videos/${fileURL.split("/").pop().split(".")[0]}`;
+  }
   try {
     console.log(`Deleting file "${publicId}" ...`);
     const result = await cloudinary.uploader.destroy(publicId); //? Delete the file from Cloudinary

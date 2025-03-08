@@ -1,3 +1,4 @@
 const DB_NAME = 'mybackend';
-const cloudinaryFolderPath = "MyBackend";
-export{DB_NAME, cloudinaryFolderPath};
+const cloudinaryUserFolderPath = "MyBackend/Users";
+const cloudinaryVideoFolderPath = "MyBackend/Videos";
+export{DB_NAME, cloudinaryUserFolderPath, cloudinaryVideoFolderPath};
