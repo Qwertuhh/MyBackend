@@ -1,12 +1,12 @@
-import asyncHandler from "../utils/asyncHandler.js";
-import APIError from "../utils/APIError.js";
+import asyncHandler from "../utils/asyncHandler.utils.js";
+import APIError from "../utils/APIError.utils.js";
 import { User } from "../models/user.model.js";
-import uploadFile from "../utils/fileUpload.js";
-import APIResponse from "../utils/APIResponse.js";
+import uploadFile from "../utils/fileUpload.utils.js";
+import APIResponse from "../utils/APIResponse.utlis.js";
 import { REFRESH_TOKEN_SECRET } from "../config.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import deleteFile from "../utils/deleteFile.js";
+import deleteFile from "../utils/deleteFile.utils.js";
 
 const options = {
   httpOnly: true,

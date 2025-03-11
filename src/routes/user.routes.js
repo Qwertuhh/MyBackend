@@ -40,4 +40,5 @@ router.route("/update-cover-image").patch(verifyAccessToken, upload.single("cove
 router.route("/channel/:username").get(verifyAccessToken, getUserChannelProfile);
 router.route("/history").get(verifyAccessToken, getWatchHistory);
 router.route("/delete-account").delete(verifyAccessToken, deleteAccount);
+
 export default router;

@@ -1,9 +1,9 @@
-import asyncHandler from "../utils/asyncHandler.js";
-import APIError from "../utils/APIError.js";
+import asyncHandler from "../utils/asyncHandler.utils.js";
+import APIError from "../utils/APIError.utils.js";
 import { User } from "../models/user.model.js";
-import uploadFile from "../utils/fileUpload.js";
-import APIResponse from "../utils/APIResponse.js";
-import deleteFile from "../utils/deleteFile.js";
+import uploadFile from "../utils/fileUpload.utils.js";
+import APIResponse from "../utils/APIResponse.utlis.js";
+import deleteFile from "../utils/deleteFile.utils.js";
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarFile = req?.file?.path;

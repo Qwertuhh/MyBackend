@@ -16,7 +16,13 @@ app.use(cookieParser());
 
 //* Routes
 import userRoutes from "./routes/user.routes.js";
+import healthcheckRoutes from "./routes/healthcheck.routes.js";
+import comment from "./routes/comment.routes.js";
+import Tweet from "./routes/tweet.routes.js";
 
 // Middlewares to Route in the following order
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/healthcheck", healthcheckRoutes);
+app.use("/api/v1/comments", comment);
+app.use("/api/v1/tweets", Tweet);
 export default app;
