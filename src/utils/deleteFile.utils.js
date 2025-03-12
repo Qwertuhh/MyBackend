@@ -12,7 +12,7 @@ cloudinary.config({
 const deleteFile = async (fileURL, isVideo=false) => {
   let publicId = `${cloudinaryUserFolderPath}/${fileURL.split("/").pop().split(".")[0]}`; //? Extract the public ID from the file URL
   if (isVideo) {
-    publicId = `${cloudinaryVideoFolderPath}/Videos/${fileURL.split("/").pop().split(".")[0]}`;
+    publicId = `${cloudinaryVideoFolderPath}/${fileURL.split("/").pop().split(".")[0]}`;
   }
   try {
     console.log(`Deleting file "${publicId}" ...`);

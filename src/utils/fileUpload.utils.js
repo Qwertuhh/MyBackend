@@ -9,12 +9,12 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const uploadFile = async (filePath, isVideo = false) => {
+const uploadFile = async (filePath, isVideoAsset = false) => {
   if (!fs.existsSync(filePath)) {
     throw new Error("File not found");
   }
   let cloudinaryFolderPath = cloudinaryUserFolderPath;
-  if (isVideo) {
+  if (isVideoAsset) {
     cloudinaryFolderPath = cloudinaryVideoFolderPath;
   }
   const uploadResult = await cloudinary.uploader
