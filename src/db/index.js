@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { MONGODB_URI, PORT } from "../config.js";
 import { DB_NAME } from "../constants.js";
 
-const clientOptions = { serverApi: { version: "1", strict: true, deprecationErrors: true } };
+const clientOptions = { serverApi: { version: "1", strict: false, deprecationErrors: true } };
 
 async function connectDB() {
   try {

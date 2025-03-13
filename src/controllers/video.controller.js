@@ -1,4 +1,4 @@
-import { isValidObjectId } from "mongoose";
+import mongoose,{ isValidObjectId } from "mongoose";
 import { Video } from "../models/video.model.js";
 import { User } from "../models/user.model.js";
 import APIError from "../utils/APIError.utils.js";
@@ -7,8 +7,66 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 import deleteFile from "../utils/deleteFile.utils.js";
 import fileUpload from "../utils/fileUpload.utils.js";
 const getAllVideos = asyncHandler(async (req, res) => {
+  //? In One Page it gives 10 videos by default
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
-  //TODO: get all videos based on query, sort, pagination
+
+  if (userId && !isValidObjectId(userId)) {
+    throw new APIError(400, "Please provide a valid userId");
+  }
+
+  const validSortFields = ["title", "views", "likes", "createdAt"];
+  if (sortBy && !validSortFields.includes(sortBy)) {
+    throw new APIError(400, `Invalid sort field. Valid fields are: ${validSortFields.join(", ")}`);
+  }
+
+  const validSortTypeFields = ["a", "d"];
+  if (sortType && !validSortTypeFields.includes(sortType)) {
+    throw new APIError(400, "Invalid sort type. Valid types are: a (ascending) or d (descending)");
+  }
+  //? Sort Options
+  const sortOptions = {
+    createdAt: -1,
+  };
+  if (sortBy) {
+    sortOptions[sortBy] = sortType === "d" ? -1 : 1;
+  }
+
+  let pipeline = [];
+  if (query) {
+    pipeline.push({
+      $search: {
+        index: "search",
+        text: {
+          query: query,
+          path: {
+            wildcard: "*",
+          },
+        },
+      },
+    });
+  }
+  console.log(query);
+  pipeline.push(
+    {
+      $match: {
+        isPublished: true,
+      },
+    },
+    { $sort: sortOptions },
+    { $skip: (page - 1) * limit },
+    { $limit: parseInt(limit) },
+  );
+
+  if (userId) {
+    pipeline.shift();//? To remove the $search pipleline
+    pipeline.unshift({ $match: { "creator._id": new mongoose.Types.ObjectId(userId) }});
+    console.log(pipeline);
+  }
+  const videos = await Video.aggregate(pipeline);
+
+  const totalVideos = await Video.countDocuments();
+
+  return res.status(200).json(new APIResponse(200, { videos, totalVideos }, "Videos fetched successfully"));
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -24,8 +82,16 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
   const videoFile = await fileUpload(videoFilePath, true);
   const thumbnailFile = await fileUpload(thumbnailPath, true);
-
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new APIError(404, "User not found");
+  }
+  const creator = { _id: user._id, username: user.username, fullname: user.fullname };
+  console.log(creator);
   if (!videoFile || !thumbnailFile) {
+    throw new APIError(500, "Failed to upload video or thumbnail");
+  }
+  if (!videoFile.url || !thumbnailFile.url) {
     throw new APIError(500, "Failed to upload video or thumbnail");
   }
   const video = await Video.create({
@@ -33,7 +99,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     description,
     videoFile: videoFile.url,
     thumbnail: thumbnailFile.url,
-    creator: userId,
+    creator: creator,
     duration: videoFile.duration,
     views: 0,
     likes: 0,
@@ -42,6 +108,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!video) {
     throw new APIError(500, "Failed to publish video");
   }
+  console.log(video);
   console.log("Video published successfully");
   return res.status(201).json(new APIResponse(201, video, "Video published successfully"));
 });
@@ -92,18 +159,16 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (!isValidObjectId(videoId)) {
     throw new APIError(400, "Invalid video id");
   }
-  // const video = await Video.findByIdAndDelete(videoId);
-  const  video = await Video.findById(videoId);
+  const video = await Video.findByIdAndDelete(videoId);
   if (!video) {
     throw new APIError(404, "Video not found");
   }
-  console.log(video);
-  await deleteFile(video.videoFile, true);
-  console.log("Video file deleted successfully");
+
+  await deleteFile(video.videoFile, true, true);
   await deleteFile(video.thumbnail, true);
 
   console.log("Video deleted successfully");
-  return res.status(200).json(new APIResponse(200, {}, "Video deleted successfully"));
+  return res.status(200).json(new APIResponse(200, video, "Video deleted successfully"));
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
