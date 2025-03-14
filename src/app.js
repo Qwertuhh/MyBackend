@@ -21,11 +21,13 @@ import comment from "./routes/comment.routes.js";
 import Tweet from "./routes/tweet.routes.js";
 import Video from "./routes/video.routes.js";
 import Like from "./routes/like.routes.js";
+import Views from "./routes/views.routes.js";
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/healthcheck", healthcheckRoutes);
 app.use("/api/v1/comments", comment);
 app.use("/api/v1/tweets", Tweet);
 app.use("/api/v1/videos", Video);
-app.use("/api/v1/Likes", Like);
+app.use("/api/v1/likes", Like);
+app.use("/api/v1/views", Views);
 export default app;
