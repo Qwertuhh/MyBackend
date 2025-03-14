@@ -206,11 +206,16 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   if (!isValidObjectId(videoId)) {
     throw new APIError(400, "Invalid video id");
   }
-  const video = await Video.findByIdAndUpdate(videoId, { isPublished: true }, { new: true });
+  const video = await Video.findById(videoId);
   if (!video) {
     throw new APIError(404, "Video not found");
   }
-  return res.status(200).json(new APIResponse(200, video, "Video published successfully"));
+  const newStatus = video.isPublished ? false : true;
+  const updatedVideo = await Video.findByIdAndUpdate(videoId, { isPublished: newStatus }, { new: true });
+  if (!updatedVideo) {
+    throw new APIError(500, "Failed to update video");
+  }
+  return res.status(200).json(new APIResponse(200, updatedVideo, newStatus ? "Video published successfully" : "Video unpublished successfully"));
 });
 
 export { getAllVideos, publishAVideo, getVideoById, updateVideo, deleteVideo, togglePublishStatus };
