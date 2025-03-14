@@ -20,10 +20,12 @@ import healthcheckRoutes from "./routes/healthcheck.routes.js";
 import comment from "./routes/comment.routes.js";
 import Tweet from "./routes/tweet.routes.js";
 import Video from "./routes/video.routes.js";
+import Like from "./routes/like.routes.js";
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/healthcheck", healthcheckRoutes);
 app.use("/api/v1/comments", comment);
 app.use("/api/v1/tweets", Tweet);
 app.use("/api/v1/videos", Video);
+app.use("/api/v1/Likes", Like);
 export default app;

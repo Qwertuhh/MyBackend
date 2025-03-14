@@ -3,10 +3,9 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const likeSchema = new mongoose.Schema(
   {
-    owner: {
+    comment: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      ref: "Video",
     },
     video: {
       type: mongoose.Schema.Types.ObjectId,

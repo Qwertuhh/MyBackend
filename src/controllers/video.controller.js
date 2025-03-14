@@ -1,12 +1,14 @@
-import mongoose,{ isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import { Video } from "../models/video.model.js";
 import { User } from "../models/user.model.js";
+import { Like } from "../models/like.model.js";
 import APIError from "../utils/APIError.utils.js";
 import APIResponse from "../utils/APIResponse.utlis.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import deleteFile from "../utils/deleteFile.utils.js";
 import fileUpload from "../utils/fileUpload.utils.js";
 
+//* Like model also use to fetch likes count
 const getAllVideos = asyncHandler(async (req, res) => {
   //? In One Page it gives 10 videos by default
   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
@@ -46,11 +48,23 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
     });
   }
-  console.log(query);
   pipeline.push(
     {
       $match: {
         isPublished: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "video",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likes: { $size: "$likes" },
       },
     },
     { $sort: sortOptions },
@@ -59,9 +73,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
   );
 
   if (userId) {
-    pipeline.shift();//? To remove the $search pipleline
-    pipeline.unshift({ $match: { "creator._id": new mongoose.Types.ObjectId(userId) }});
-    console.log(pipeline);
+    pipeline.shift(); //? To remove the $search pipleline
+    pipeline.unshift({ $match: { "creator._id": new mongoose.Types.ObjectId(userId) } });
   }
   const videos = await Video.aggregate(pipeline);
 
@@ -114,14 +127,30 @@ const publishAVideo = asyncHandler(async (req, res) => {
   return res.status(201).json(new APIResponse(201, video, "Video published successfully"));
 });
 
+//* Like model also use to fetch likes count
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  const video = await Video.findById(videoId).populate("creator", "fullname username");
-  if (!video) {
+  const video = await Video.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "video",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likes: { $size: "$likes" },
+      },
+    },
+  ]);
+  if (!video || !video.length) {
     throw new APIError(404, "Video not found");
   }
   console.log("Video fetched successfully");
-  return res.status(200).json(new APIResponse(200, video, "Video fetched successfully"));
+  return res.status(200).json(new APIResponse(200, video[0], "Video fetched successfully"));
 });
 
 const updateVideo = asyncHandler(async (req, res) => {

@@ -5,6 +5,7 @@ import APIResponse from "../utils/APIResponse.utlis.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
 //* To get all comments for a video
+//* Like model also use to fetch likes count
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!mongoose.isValidObjectId(videoId)) {
@@ -16,7 +17,16 @@ const getVideoComments = asyncHandler(async (req, res) => {
     limit: parseInt(limit, 10),
   };
   const comments = await Comment.aggregate([
-    { $match: { video: mongoose.Types.ObjectId.createFromHexString(videoId) } },
+    { $match: { video: new mongoose.Types.ObjectId(videoId) } },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "comment",
+        as: "likes",
+      },
+    },
+    { $addFields: { likes: { $size: "$likes" } } },
     { $skip: (options.page - 1) * options.limit },
     { $limit: options.limit }
   ]);
