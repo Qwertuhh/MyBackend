@@ -32,5 +32,5 @@ app.use(`${server}/tweets`, Tweet);
 app.use(`${server}/videos`, Video);
 app.use(`${server}/likes`, Like);
 app.use(`${server}/views`, Views);
-app.use(`${server}/subscriptions`, Views);
+app.use(`${server}/subscriptions`, Subscription);
 export default app;

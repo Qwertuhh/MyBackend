@@ -2,7 +2,6 @@ class APIError extends Error {
   constructor(statusCode, message = "Something went wrong", errors = [], stack = "") {
     super(message);
     this.statusCode = statusCode;
-    console.log(this.data);
     this.data = null;
     this.message = message;
     this.success = false;
