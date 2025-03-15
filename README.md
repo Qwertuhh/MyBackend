@@ -2,8 +2,8 @@
 
 *This is a mega project created during journey of backend course*
 
-> [!NOTE] 
-> Working on **assignment now** 
+> [!IMPORTANT]
+> **assignment completed**
 
 - Learn Postman (test pre-script, post-req, etc)
 - Status codes
@@ -15,3 +15,6 @@
 - Query
 - Aggregation Pipeline
 - etc
+
+> [!NOTE]
+> *API Tested in Postman it will available soon in public*
