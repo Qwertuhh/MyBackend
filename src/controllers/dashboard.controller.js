@@ -8,6 +8,11 @@ const getChannelStats = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const stats = await User.aggregate([
     {
+      $match: {
+        _id: userId
+      }
+    },
+    {
       $lookup: {
         from: "subscriptions",
         localField: "_id",
